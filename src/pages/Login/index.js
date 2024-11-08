@@ -31,7 +31,7 @@ function Login() {
   return (
     <>
       <div className="login">
-        <img src="/bhx logo.png" alt="logo" />
+        <img src="/React_bachhoaxanh/bhx logo.png" alt="logo" />
         <div className="login-container">
           <header>
             <h1>Hệ Thống Quản Lý Cửa Hàng</h1>
