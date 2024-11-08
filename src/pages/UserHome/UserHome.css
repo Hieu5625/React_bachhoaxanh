@@ -1,0 +1,30 @@
+/* src/pages/UserHome.css */
+
+.user-home {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-home h2 {
+  color: #4caf50;
+}
+
+.user-home h3 {
+  margin-top: 20px;
+  color: #333;
+}
+
+.user-home ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.user-home ul li {
+  margin: 8px 0;
+}
+
+.user-home strong {
+  color: #555;
+}
