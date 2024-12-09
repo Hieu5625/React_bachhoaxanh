@@ -1,18 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import "./LayoutDefault.css";
 
 function Layout() {
-  const userName = "Nguyễn Văn A";
+  const [userName, setUserName] = useState("");
   const navigate = useNavigate();
 
+  // Lấy thông tin người dùng từ localStorage
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      setUserName(user.name);
+    } else {
+      navigate("/"); // Điều hướng về trang login nếu chưa đăng nhập
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
-    navigate("/");
+    localStorage.removeItem("user"); // Xóa thông tin người dùng khỏi localStorage
+    navigate("/"); // Chuyển về trang login
   };
+
   return (
     <div className="container">
       <header>
-        <h1>Quản Lý Cửa Hàng</h1>
+        <h1>Quản Lý Cửa Hàng Bách Hóa Xanh</h1>
         <div className="user-info">
           <span>
             Xin chào, <Link to="/user">{userName}</Link>
@@ -26,16 +38,16 @@ function Layout() {
         <nav className="sidebar">
           <ul>
             <li>
-              <NavLink to="/user-home">Trang Chủ</NavLink>
+              <NavLink to="/home">Trang Chủ</NavLink>
             </li>
             <li>
-              <NavLink to="/user-products">Sản Phẩm</NavLink>
+              <NavLink to="/products">Sản Phẩm</NavLink>
             </li>
             <li>
-              <NavLink to="/user-customer">Khách Hàng</NavLink>
+              <NavLink to="/customer">Khách Hàng</NavLink>
             </li>
             <li>
-              <NavLink to="/user3">Doanh Thu</NavLink>
+              <NavLink to="/revenue">Doanh Thu</NavLink>
             </li>
           </ul>
         </nav>

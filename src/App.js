@@ -2,18 +2,18 @@ import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import LayoutDefault from "./layout/LayoutDefault";
-import ProductTable from "./pages/ProductTable";
+import ProductTable from "./pages/productTable";
 import CustomerTable from "./pages/CustomerTable";
-import UserHome from "./pages/UserHome";
+import Home from "./pages/Home";
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route element={<LayoutDefault />}>
-          <Route path="user-home" element={<UserHome />} />
-          <Route path="user-products" element={<ProductTable />} />
-          <Route path="user-customer" element={<CustomerTable />} />
+          <Route path="home" element={<Home />} />
+          <Route path="products" element={<ProductTable />} />
+          <Route path="customer" element={<CustomerTable />} />
         </Route>
       </Routes>
     </>

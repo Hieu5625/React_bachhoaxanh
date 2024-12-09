@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { getCustomers, addCustomer } from "../../services/CustomerService";
+import {
+  getCustomers,
+  addCustomer,
+  updateCustomer,
+  deleteCustomer,
+} from "../../services/CustomerService";
 
 function CustomerTable() {
-  const [Customers, setCustomers] = useState([]);
-  const [isAdding, setIsAdding] = useState(false); // Kiểm soát hiển thị form thêm Khách
+  const [customers, setCustomers] = useState([]);
+  const [isAdding, setIsAdding] = useState(false); // Kiểm soát hiển thị form thêm khách
+  const [editingCustomerId, setEditingCustomerId] = useState(null); // Lưu trạng thái khách hàng đang được chỉnh sửa
   const [newCustomer, setNewCustomer] = useState({
     MA_KH: "",
     HO_KH: "",
@@ -11,36 +17,55 @@ function CustomerTable() {
     SDT_KH: "",
     EMAIL_KH: "",
   });
+  const [editedCustomer, setEditedCustomer] = useState({}); // Lưu thông tin khách hàng đang chỉnh sửa
 
-  // Lấy danh sách Khách từ API khi component được mount
+  // Lấy danh sách khách hàng từ API khi component được mount
   useEffect(() => {
     async function fetchCustomers() {
       try {
         const data = await getCustomers();
         setCustomers(data);
       } catch (error) {
-        console.error("Lỗi khi lấy danh sách Khách:", error);
+        console.error("Lỗi khi lấy danh sách khách hàng:", error);
       }
     }
     fetchCustomers();
   }, []);
 
-  // Hiển thị form thêm Khách
+  // Hiển thị form thêm khách hàng
   const handleAddClick = () => {
     setIsAdding(true);
   };
 
-  // Xử lý thay đổi trong ô input
+  // Ẩn form thêm khách hàng
+  const handleCancelAddClick = () => {
+    setNewCustomer({
+      MA_KH: "",
+      HO_KH: "",
+      TEN_KH: "",
+      SDT_KH: "",
+      EMAIL_KH: "",
+    }); // Đặt lại form
+    setIsAdding(false); // Ẩn form
+  };
+
+  // Xử lý thay đổi trong ô input khi thêm khách hàng
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCustomer((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Lưu Khách mới và cập nhật danh sách
+  // Xử lý thay đổi trong ô chỉnh sửa khi chỉnh sửa khách hàng
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedCustomer((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Lưu khách hàng mới và cập nhật danh sách
   const handleSaveClick = async () => {
     try {
       const addedCustomer = await addCustomer(newCustomer);
-      setCustomers([...Customers, addedCustomer]); // Thêm Khách vào danh sách
+      setCustomers([...customers, addedCustomer]); // Thêm khách hàng vào danh sách
       setNewCustomer({
         MA_KH: "",
         HO_KH: "",
@@ -49,18 +74,55 @@ function CustomerTable() {
         EMAIL_KH: "",
       }); // Reset form
       setIsAdding(false); // Ẩn form
-      alert("Khách đã được thêm thành công!");
+      alert("Khách hàng đã được thêm thành công!");
     } catch (error) {
-      console.error("Lỗi khi thêm Khách:", error);
-      alert("Không thể thêm Khách!");
+      console.error("Lỗi khi thêm khách hàng:", error);
+      alert("Không thể thêm khách hàng!");
+    }
+  };
+
+  // Bắt đầu chỉnh sửa khách hàng
+  const handleEditClick = (customer) => {
+    setEditingCustomerId(customer.MA_KH);
+    setEditedCustomer(customer);
+  };
+
+  // Lưu thay đổi sau khi chỉnh sửa khách hàng
+  const handleSaveEditClick = async () => {
+    try {
+      await updateCustomer(editingCustomerId, editedCustomer);
+      setCustomers(
+        customers.map((customer) =>
+          customer.MA_KH === editingCustomerId ? editedCustomer : customer
+        )
+      );
+      setEditingCustomerId(null); // Thoát chế độ chỉnh sửa
+      alert("Cập nhật khách hàng thành công!");
+    } catch (error) {
+      console.error("Lỗi khi cập nhật khách hàng:", error);
+      alert("Không thể cập nhật khách hàng!");
+    }
+  };
+
+  // Xóa khách hàng
+  const handleDeleteClick = async (MA_KH) => {
+    try {
+      const result = await deleteCustomer(MA_KH);
+      if (result && result.message === "Xóa khách hàng thành công!") {
+        setCustomers(customers.filter((customer) => customer.MA_KH !== MA_KH));
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa khách hàng:", error);
+      alert("Không thể xóa khách hàng!");
     }
   };
 
   return (
     <div>
-      <h3>Danh Sách Khách</h3>
-      <button onClick={handleAddClick} className="add-Customer-button">
-        Thêm Khách
+      <h3>Danh Sách Khách Hàng</h3>
+      <button onClick={handleAddClick} className="add-customer-button">
+        Thêm Khách Hàng
       </button>
       <table>
         <thead>
@@ -68,13 +130,13 @@ function CustomerTable() {
             <th>Mã Khách</th>
             <th>Họ Khách</th>
             <th>Tên Khách</th>
-            <th>Số điện thoại</th>
+            <th>Số Điện Thoại</th>
             <th>Email</th>
             <th>Thao Tác</th>
           </tr>
         </thead>
         <tbody>
-          {/* Hiển thị form thêm Khách nếu isAdding là true */}
+          {/* Hiển thị form thêm khách hàng nếu isAdding là true */}
           {isAdding && (
             <tr>
               <td>
@@ -110,7 +172,7 @@ function CustomerTable() {
                   name="SDT_KH"
                   value={newCustomer.SDT_KH}
                   onChange={handleInputChange}
-                  placeholder="Số điện thoại"
+                  placeholder="Số Điện Thoại"
                 />
               </td>
               <td>
@@ -126,34 +188,81 @@ function CustomerTable() {
                 <button onClick={handleSaveClick} className="save-button">
                   Lưu
                 </button>
+                <button
+                  onClick={handleCancelAddClick}
+                  className="cancel-button"
+                >
+                  Hủy
+                </button>
               </td>
             </tr>
           )}
 
-          {/* Hiển thị danh sách Khách */}
-          {Customers.map((Customer) => (
-            <tr key={Customer.MA_KH}>
-              <td>
-                <p>{Customer.MA_KH}</p>
-              </td>
-              <td>
-                <p>{Customer.HO_KH}</p>
-              </td>
-              <td>
-                <p>{Customer.TEN_KH}</p>
-              </td>
-              <td>
-                <p>{Customer.SDT_KH}</p>
-              </td>
-              <td>
-                <p>{Customer.EMAIL_KH}</p>
-              </td>
-              <td>
-                <button onClick={() => {}}>Sửa</button>
-                <button onClick={() => {}}>Xóa</button>
-              </td>
-            </tr>
-          ))}
+          {/* Hiển thị danh sách khách hàng */}
+          {customers.map((customer) =>
+            editingCustomerId === customer.MA_KH ? (
+              <tr key={customer.MA_KH}>
+                <td>{customer.MA_KH}</td>
+                <td>
+                  <input
+                    type="text"
+                    name="HO_KH"
+                    value={editedCustomer.HO_KH}
+                    onChange={handleEditInputChange}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    name="TEN_KH"
+                    value={editedCustomer.TEN_KH}
+                    onChange={handleEditInputChange}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    name="SDT_KH"
+                    value={editedCustomer.SDT_KH}
+                    onChange={handleEditInputChange}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    name="EMAIL_KH"
+                    value={editedCustomer.EMAIL_KH}
+                    onChange={handleEditInputChange}
+                  />
+                </td>
+                <td>
+                  <button onClick={handleSaveEditClick} className="save-button">
+                    Lưu
+                  </button>
+                  <button
+                    onClick={() => setEditingCustomerId(null)}
+                    className="cancel-button"
+                  >
+                    Hủy
+                  </button>
+                </td>
+              </tr>
+            ) : (
+              <tr key={customer.MA_KH}>
+                <td>{customer.MA_KH}</td>
+                <td>{customer.HO_KH}</td>
+                <td>{customer.TEN_KH}</td>
+                <td>{customer.SDT_KH}</td>
+                <td>{customer.EMAIL_KH}</td>
+                <td>
+                  <button onClick={() => handleEditClick(customer)}>Sửa</button>
+                  <button onClick={() => handleDeleteClick(customer.MA_KH)}>
+                    Xóa
+                  </button>
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </table>
     </div>
