@@ -185,3 +185,10 @@ table input {
   border: 1px solid #ced4da;
   border-radius: 3px;
 }
+
+.search-input {
+  padding: 5px;
+  margin: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

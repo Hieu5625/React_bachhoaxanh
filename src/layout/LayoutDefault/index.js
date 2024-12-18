@@ -47,7 +47,7 @@ function Layout() {
               <NavLink to="/customer">Khách Hàng</NavLink>
             </li>
             <li>
-              <NavLink to="/revenue">Doanh Thu</NavLink>
+              <NavLink to="/employees">Nhân Viên</NavLink>
             </li>
           </ul>
         </nav>
