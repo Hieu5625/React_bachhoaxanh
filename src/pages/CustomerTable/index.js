@@ -7,13 +7,12 @@ import {
 } from "../../services/CustomerService";
 
 function CustomerTable() {
-  const [customers, setCustomers] = useState([]);
-  const [isAdding, setIsAdding] = useState(false); // Kiểm soát hiển thị form thêm khách
+  const [customers, setCustomers] = useState([]); // Danh sách khách hàng
+  const [isAdding, setIsAdding] = useState(false); // Kiểm soát hiển thị form thêm khách hàng
   const [editingCustomerId, setEditingCustomerId] = useState(null); // Lưu trạng thái khách hàng đang được chỉnh sửa
   const [newCustomer, setNewCustomer] = useState({
     MA_KH: "",
-    HO_KH: "",
-    TEN_KH: "",
+    HOTEN_KH: "",
     SDT_KH: "",
     EMAIL_KH: "",
   });
@@ -41,8 +40,7 @@ function CustomerTable() {
   const handleCancelAddClick = () => {
     setNewCustomer({
       MA_KH: "",
-      HO_KH: "",
-      TEN_KH: "",
+      HOTEN_KH: "",
       SDT_KH: "",
       EMAIL_KH: "",
     }); // Đặt lại form
@@ -68,8 +66,7 @@ function CustomerTable() {
       setCustomers([...customers, addedCustomer]); // Thêm khách hàng vào danh sách
       setNewCustomer({
         MA_KH: "",
-        HO_KH: "",
-        TEN_KH: "",
+        HOTEN_KH: "",
         SDT_KH: "",
         EMAIL_KH: "",
       }); // Reset form
@@ -128,8 +125,7 @@ function CustomerTable() {
         <thead>
           <tr>
             <th>Mã Khách</th>
-            <th>Họ Khách</th>
-            <th>Tên Khách</th>
+            <th>Họ Tên Khách</th>
             <th>Số Điện Thoại</th>
             <th>Email</th>
             <th>Thao Tác</th>
@@ -151,19 +147,10 @@ function CustomerTable() {
               <td>
                 <input
                   type="text"
-                  name="HO_KH"
-                  value={newCustomer.HO_KH}
+                  name="HOTEN_KH"
+                  value={newCustomer.HOTEN_KH}
                   onChange={handleInputChange}
-                  placeholder="Họ Khách"
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  name="TEN_KH"
-                  value={newCustomer.TEN_KH}
-                  onChange={handleInputChange}
-                  placeholder="Tên Khách"
+                  placeholder="Họ Tên"
                 />
               </td>
               <td>
@@ -206,16 +193,8 @@ function CustomerTable() {
                 <td>
                   <input
                     type="text"
-                    name="HO_KH"
-                    value={editedCustomer.HO_KH}
-                    onChange={handleEditInputChange}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="TEN_KH"
-                    value={editedCustomer.TEN_KH}
+                    name="HOTEN_KH"
+                    value={editedCustomer.HOTEN_KH}
                     onChange={handleEditInputChange}
                   />
                 </td>
@@ -250,8 +229,7 @@ function CustomerTable() {
             ) : (
               <tr key={customer.MA_KH}>
                 <td>{customer.MA_KH}</td>
-                <td>{customer.HO_KH}</td>
-                <td>{customer.TEN_KH}</td>
+                <td>{customer.HOTEN_KH}</td>
                 <td>{customer.SDT_KH}</td>
                 <td>{customer.EMAIL_KH}</td>
                 <td>

@@ -49,6 +49,12 @@ function Layout() {
             <li>
               <NavLink to="/employees">Nhân Viên</NavLink>
             </li>
+            <li>
+              <NavLink to="/receipt">Lập Phiếu Nhập</NavLink>
+            </li>
+            <li>
+              <NavLink to="/receipts">Danh Sách Phiếu Nhập</NavLink>
+            </li>
           </ul>
         </nav>
         <main className="content">

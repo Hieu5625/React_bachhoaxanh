@@ -1,10 +1,9 @@
-const API_URL = "http://localhost:5000/api/Customers";
+const API_URL = "http://localhost:5000/api/customers";
 
-// Hàm lấy danh sách sản phẩm
 export const getCustomers = async () => {
   try {
     const response = await fetch(API_URL);
-    if (!response.ok) throw new Error("Lỗi khi lấy danh sách sản phẩm");
+    if (!response.ok) throw new Error("Lỗi khi lấy danh sách khách hàng");
     return await response.json();
   } catch (error) {
     console.error("Lỗi khi gọi API getCustomers:", error);
@@ -12,15 +11,14 @@ export const getCustomers = async () => {
   }
 };
 
-// Hàm thêm Khách hàng mới
-export const addCustomer = async (Customer) => {
+export const addCustomer = async (customer) => {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(Customer),
+      body: JSON.stringify(customer),
     });
-    if (!response.ok) throw new Error("Lỗi khi thêm sản phẩm");
+    if (!response.ok) throw new Error("Lỗi khi thêm khách hàng");
     return await response.json();
   } catch (error) {
     console.error("Lỗi khi gọi API addCustomer:", error);
@@ -28,7 +26,6 @@ export const addCustomer = async (Customer) => {
   }
 };
 
-// Hàm cập nhật sản phẩm
 export const updateCustomer = async (id, updatedCustomer) => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
@@ -36,7 +33,7 @@ export const updateCustomer = async (id, updatedCustomer) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedCustomer),
     });
-    if (!response.ok) throw new Error("Lỗi khi cập nhật sản phẩm");
+    if (!response.ok) throw new Error("Lỗi khi cập nhật khách hàng");
     return await response.json();
   } catch (error) {
     console.error("Lỗi khi gọi API updateCustomer:", error);
@@ -44,13 +41,12 @@ export const updateCustomer = async (id, updatedCustomer) => {
   }
 };
 
-// Hàm xóa sản phẩm
 export const deleteCustomer = async (id) => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Lỗi khi xóa sản phẩm");
+    if (!response.ok) throw new Error("Lỗi khi xóa khách hàng");
     return await response.json();
   } catch (error) {
     console.error("Lỗi khi gọi API deleteCustomer:", error);
