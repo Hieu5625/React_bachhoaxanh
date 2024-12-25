@@ -1,6 +1,36 @@
-// src/services/productService.js
-
 const API_URL = "http://localhost:5000/api/products";
+const API_CATEGORY_URL = "http://localhost:5000/api/categories";
+const API_UPDATE_FROM_RECEIPT =
+  "http://localhost:5000/api/products/update-from-receipt";
+
+// Lấy danh mục sản phẩm
+export const getCategories = async () => {
+  try {
+    const response = await fetch(API_CATEGORY_URL);
+    if (!response.ok) throw new Error("Lỗi khi lấy danh mục sản phẩm");
+    return await response.json();
+  } catch (error) {
+    console.error("Lỗi khi gọi API getCategories:", error);
+    throw error;
+  }
+};
+
+// Cập nhật số lượng sản phẩm từ phiếu nhập
+export const updateFromReceipt = async (receiptId) => {
+  try {
+    const response = await fetch(API_UPDATE_FROM_RECEIPT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ SOPHIEUNHAPHANG: receiptId }),
+    });
+    if (!response.ok)
+      throw new Error("Lỗi khi cập nhật số lượng từ phiếu nhập");
+    return await response.json();
+  } catch (error) {
+    console.error("Lỗi khi gọi API updateFromReceipt:", error);
+    throw error;
+  }
+};
 
 // Hàm lấy danh sách sản phẩm
 export const getProducts = async () => {

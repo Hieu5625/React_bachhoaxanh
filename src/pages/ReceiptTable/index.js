@@ -82,7 +82,7 @@ function ReceiptTable() {
                   <td>{item.TENHANG}</td>
                   <td>{item.SOLUONGNHAP}</td>
                   <td>{item.DONGIANHAP}</td>
-                  <td>{item.CHATLUONGHANG}</td>
+                  <td>{item.CHATLUONGHANG ? "Còn Hạn" : "Hết Hạn"}</td>
                 </tr>
               ))}
             </tbody>

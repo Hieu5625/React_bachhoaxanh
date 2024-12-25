@@ -1,23 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { getEmployees } from "../../services/EmployeeService";
 import { getProducts } from "../../services/ProductService";
-import { addReceipt, addReceiptDetail } from "../../services/ReceiptService";
+import {
+  getSuppliers,
+  addReceipt,
+  addReceiptDetail,
+} from "../../services/ReceiptService";
+
+// Hàm định dạng ngày hiện tại theo định dạng YYYY-MM-DD
+const getTodayDate = () => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0
+  const dd = String(today.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 function ReceiptForm() {
   const [employees, setEmployees] = useState([]);
   const [products, setProducts] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   const [receipt, setReceipt] = useState({
     SOPHIEUNHAPHANG: "",
     MA_NV: "",
     NHACUNGCAP: "",
-    NGAYNHAPHANG: "",
+    NGAYNHAPHANG: getTodayDate(), // Ngày mặc định là hôm nay
     details: [],
   });
   const [detail, setDetail] = useState({
     MAVACH: "",
     SOLUONGNHAP: 0,
     DONGIANHAP: 0,
-    CHATLUONGHANG: "",
   });
 
   useEffect(() => {
@@ -25,8 +38,10 @@ function ReceiptForm() {
       try {
         const employeeData = await getEmployees();
         const productData = await getProducts();
+        const supplierData = await getSuppliers();
         setEmployees(employeeData);
         setProducts(productData);
+        setSuppliers(supplierData);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
       }
@@ -42,7 +57,7 @@ function ReceiptForm() {
         { ...detail, TENHANG: getProductName(detail.MAVACH) },
       ],
     }));
-    setDetail({ MAVACH: "", SOLUONGNHAP: 0, DONGIANHAP: 0, CHATLUONGHANG: "" });
+    setDetail({ MAVACH: "", SOLUONGNHAP: 0, DONGIANHAP: 0 });
   };
 
   const getProductName = (MAVACH) => {
@@ -63,6 +78,17 @@ function ReceiptForm() {
     } catch (error) {
       console.error("Lỗi khi lưu phiếu nhập hàng:", error);
       alert("Không thể lưu phiếu nhập hàng!");
+    }
+  };
+
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    const today = getTodayDate();
+    if (selectedDate < today) {
+      alert("Không thể chọn ngày trước hôm nay!");
+      setReceipt({ ...receipt, NGAYNHAPHANG: today }); // Đặt lại là hôm nay
+    } else {
+      setReceipt({ ...receipt, NGAYNHAPHANG: selectedDate });
     }
   };
 
@@ -91,20 +117,24 @@ function ReceiptForm() {
           ))}
         </select>
         <label>Nhà Cung Cấp:</label>
-        <input
-          type="text"
+        <select
           value={receipt.NHACUNGCAP}
           onChange={(e) =>
             setReceipt({ ...receipt, NHACUNGCAP: e.target.value })
           }
-        />
+        >
+          <option value="">Chọn Nhà Cung Cấp</option>
+          {suppliers.map((supplier, index) => (
+            <option key={index} value={supplier}>
+              {supplier}
+            </option>
+          ))}
+        </select>
         <label>Ngày Nhập Hàng:</label>
         <input
           type="date"
           value={receipt.NGAYNHAPHANG}
-          onChange={(e) =>
-            setReceipt({ ...receipt, NGAYNHAPHANG: e.target.value })
-          }
+          onChange={handleDateChange}
         />
         <h3>Chi Tiết Phiếu Nhập</h3>
         <label>Sản Phẩm:</label>
@@ -133,20 +163,11 @@ function ReceiptForm() {
           value={detail.DONGIANHAP}
           onChange={(e) => setDetail({ ...detail, DONGIANHAP: e.target.value })}
         />
-        <label>Chất Lượng:</label>
-        <input
-          type="text"
-          value={detail.CHATLUONGHANG}
-          onChange={(e) =>
-            setDetail({ ...detail, CHATLUONGHANG: e.target.value })
-          }
-        />
         <button type="button" onClick={handleAddDetail}>
           Thêm Chi Tiết
         </button>
       </form>
 
-      {/* Hiển thị danh sách chi tiết phiếu nhập */}
       <h3>Danh Sách Chi Tiết</h3>
       <table>
         <thead>
@@ -154,7 +175,6 @@ function ReceiptForm() {
             <th>Sản Phẩm</th>
             <th>Số Lượng</th>
             <th>Đơn Giá</th>
-            <th>Chất Lượng</th>
           </tr>
         </thead>
         <tbody>
@@ -163,12 +183,10 @@ function ReceiptForm() {
               <td>{d.TENHANG}</td>
               <td>{d.SOLUONGNHAP}</td>
               <td>{d.DONGIANHAP}</td>
-              <td>{d.CHATLUONGHANG}</td>
             </tr>
           ))}
         </tbody>
       </table>
-
       <button type="button" onClick={handleSubmit}>
         Lưu Phiếu Nhập
       </button>

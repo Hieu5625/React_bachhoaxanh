@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import EmployeeTable from "./pages/EmployeeTable";
 import ReceiptForm from "./pages/Receipt";
 import ReceiptTable from "./pages/ReceiptTable";
+import InvoiceTable from "./pages/InvoiceTable";
+import CreateInvoice from "./pages/CreateInvoice";
 function App() {
   return (
     <>
@@ -20,6 +22,8 @@ function App() {
           <Route path="employees" element={<EmployeeTable />} />
           <Route path="Receipt" element={<ReceiptForm />} />
           <Route path="receipts" element={<ReceiptTable />} />
+          <Route path="invoice" element={<InvoiceTable />} />
+          <Route path="invoices" element={<CreateInvoice />} />
         </Route>
       </Routes>
     </>

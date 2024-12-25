@@ -1,6 +1,19 @@
-const API_URL_RECEIPT = "http://localhost:5000/api/receipts";
 const API_URL = "http://localhost:5000/api/receipts";
 const API_URL_DETAIL = "http://localhost:5000/api/receipt-details";
+const API_URL_SUPPLIERS = "http://localhost:5000/api/suppliers";
+
+// Lấy danh sách nhà cung cấp
+export const getSuppliers = async () => {
+  try {
+    const response = await fetch(API_URL_SUPPLIERS);
+    if (!response.ok) throw new Error("Lỗi khi lấy danh sách nhà cung cấp");
+    return await response.json();
+  } catch (error) {
+    console.error("Lỗi khi gọi API getSuppliers:", error);
+    throw error;
+  }
+};
+
 // Lấy danh sách phiếu nhập
 export const getReceipts = async () => {
   try {
@@ -25,9 +38,10 @@ export const getReceiptDetails = async (SOPHIEUNHAPHANG) => {
   }
 };
 
+// Thêm phiếu nhập hàng
 export const addReceipt = async (receipt) => {
   try {
-    const response = await fetch(API_URL_RECEIPT, {
+    const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(receipt),
@@ -40,6 +54,7 @@ export const addReceipt = async (receipt) => {
   }
 };
 
+// Thêm chi tiết phiếu nhập hàng
 export const addReceiptDetail = async (detail) => {
   try {
     const response = await fetch(API_URL_DETAIL, {

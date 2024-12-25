@@ -4,12 +4,17 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  getCategories,
+  updateFromReceipt,
 } from "../../services/ProductService";
 
 function ProductTable() {
   const [products, setProducts] = useState([]);
   const [isAdding, setIsAdding] = useState(false); // Kiểm soát hiển thị form thêm sản phẩm
   const [editingProductId, setEditingProductId] = useState(null); // Lưu trạng thái sản phẩm đang được chỉnh sửa
+  const [categories, setCategories] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [receiptId, setReceiptId] = useState(""); // Mã phiếu nhập để cập nhật
   const [newProduct, setNewProduct] = useState({
     MAVACH: "",
     TENHANG: "",
@@ -22,17 +27,41 @@ function ProductTable() {
 
   // Lấy danh sách sản phẩm từ API khi component được mount
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const data = await getProducts();
-        setProducts(data);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách sản phẩm:", error);
-      }
-    }
     fetchProducts();
+    fetchCategories();
   }, []);
 
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts(searchKeyword);
+      setProducts(data);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh mục sản phẩm:", error);
+    }
+  };
+  const handleSearchChange = (e) => {
+    setSearchKeyword(e.target.value);
+    fetchProducts();
+  };
+
+  const handleUpdateFromReceipt = async () => {
+    try {
+      const result = await updateFromReceipt(receiptId);
+      alert(result.message);
+      fetchProducts(); // Cập nhật danh sách sản phẩm
+    } catch (error) {
+      console.error("Lỗi khi cập nhật từ phiếu nhập:", error);
+    }
+  };
   // Hiển thị form thêm sản phẩm
   const handleAddClick = () => {
     setIsAdding(true);
@@ -124,9 +153,29 @@ function ProductTable() {
   return (
     <div>
       <h3>Danh Sách Sản Phẩm</h3>
-      <button onClick={handleAddClick} className="add-product-button">
-        Thêm Sản Phẩm
-      </button>
+      <div>
+        <button onClick={handleAddClick} className="add-product-button">
+          Thêm Sản Phẩm
+        </button>
+        <input
+          type="text"
+          placeholder="Tìm kiếm sản phẩm..."
+          value={searchKeyword}
+          onChange={handleSearchChange}
+        />
+        <button onClick={fetchProducts}>Tìm kiếm</button>
+      </div>
+      <div>
+        <input
+          type="text"
+          placeholder="Nhập mã phiếu nhập"
+          value={receiptId}
+          onChange={(e) => setReceiptId(e.target.value)}
+        />
+        <button onClick={handleUpdateFromReceipt}>
+          Cập nhật từ Phiếu Nhập
+        </button>
+      </div>
       <table>
         <thead>
           <tr>
