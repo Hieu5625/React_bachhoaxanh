@@ -1,37 +1,51 @@
-const API_URL = "http://localhost:5000/api";
-const API_EMPLOYEES = `${API_URL}/employees`;
-const API_CUSTOMERS = `${API_URL}/customers`;
-const API_INVOICES = `${API_URL}/invoices`;
-const API_INVOICE_DETAILS = `${API_URL}/invoice-details`;
+const API_URL = "http://localhost:5000/api/invoices";
+const API_URL_DETAILS = "http://localhost:5000/api/invoice-details";
+const API_invoices = "http://localhost:5000/api/invoices";
 
-// Lấy danh sách nhân viên
-export const getEmployees = async () => {
+// Hàm cập nhật trạng thái thanh toán của hóa đơn
+export const updateInvoiceStatus = async (MA_HD, DATHANHTOAN) => {
   try {
-    const response = await fetch(API_EMPLOYEES);
-    if (!response.ok) throw new Error("Lỗi khi lấy danh sách nhân viên");
+    const response = await fetch(`${API_invoices}/${MA_HD}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ DATHANHTOAN }),
+    });
+    if (!response.ok) throw new Error("Lỗi khi cập nhật trạng thái hóa đơn");
     return await response.json();
   } catch (error) {
-    console.error("Lỗi khi gọi API getEmployees:", error);
+    console.error("Lỗi khi gọi API updateInvoiceStatus:", error);
     throw error;
   }
 };
 
-// Lấy danh sách khách hàng
-export const getCustomers = async () => {
+// Hàm lấy danh sách hóa đơn
+export const getInvoices = async () => {
   try {
-    const response = await fetch(API_CUSTOMERS);
-    if (!response.ok) throw new Error("Lỗi khi lấy danh sách khách hàng");
+    const response = await fetch(API_URL);
+    if (!response.ok) throw new Error("Lỗi khi lấy danh sách hóa đơn");
     return await response.json();
   } catch (error) {
-    console.error("Lỗi khi gọi API getCustomers:", error);
+    console.error("Lỗi khi gọi API getInvoices:", error);
     throw error;
   }
 };
 
-// Thêm hóa đơn mới
+// Hàm lấy chi tiết hóa đơn
+export const getInvoiceDetails = async (MA_HD) => {
+  try {
+    const response = await fetch(`${API_URL}/${MA_HD}`);
+    if (!response.ok) throw new Error("Lỗi khi lấy chi tiết hóa đơn");
+    return await response.json();
+  } catch (error) {
+    console.error("Lỗi khi gọi API getInvoiceDetails:", error);
+    throw error;
+  }
+};
+
+// Hàm thêm hóa đơn
 export const addInvoice = async (invoice) => {
   try {
-    const response = await fetch(API_INVOICES, {
+    const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(invoice),
@@ -44,10 +58,10 @@ export const addInvoice = async (invoice) => {
   }
 };
 
-// Thêm chi tiết hóa đơn
+// Hàm thêm chi tiết hóa đơn
 export const addInvoiceDetail = async (detail) => {
   try {
-    const response = await fetch(API_INVOICE_DETAILS, {
+    const response = await fetch(API_URL_DETAILS, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(detail),

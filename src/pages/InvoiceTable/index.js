@@ -1,168 +1,135 @@
 import React, { useEffect, useState } from "react";
 import {
-  getEmployees,
-  getCustomers,
-  addInvoice,
-  addInvoiceDetail,
+  getInvoices,
+  getInvoiceDetails,
+  updateInvoiceStatus,
 } from "../../services/InvoiceService";
 
 function InvoiceTable() {
-  const [employees, setEmployees] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [invoice, setInvoice] = useState({
-    MA_HD: "",
-    MA_KH: "",
-    MA_NV: "",
-    NGAYLAPHOADON: new Date().toISOString().split("T")[0],
-    DATHANHTOAN: false,
-    details: [],
-  });
-  const [detail, setDetail] = useState({
-    MAVACH: "",
-    SOLUONGBAN: 0,
-    GIAMGIA: 0,
-    THANHTIEN: 0,
-  });
+  const [invoices, setInvoices] = useState([]);
+  const [selectedInvoice, setSelectedInvoice] = useState(null); // Mã hóa đơn được chọn
+  const [invoiceDetails, setInvoiceDetails] = useState([]); // Chi tiết hóa đơn của hóa đơn được chọn
+  const [selectedInvoiceData, setSelectedInvoiceData] = useState(null); // Thông tin hóa đơn được chọn
 
+  // Lấy danh sách hóa đơn khi component được mount
   useEffect(() => {
-    async function fetchData() {
+    async function fetchInvoices() {
       try {
-        const employeeData = await getEmployees();
-        const customerData = await getCustomers();
-        setEmployees(employeeData);
-        setCustomers(customerData);
+        const data = await getInvoices(); // Gọi API để lấy danh sách hóa đơn
+        setInvoices(data);
       } catch (error) {
-        console.error("Lỗi khi tải dữ liệu:", error);
+        console.error("Lỗi khi lấy danh sách hóa đơn:", error);
+        alert("Không thể tải danh sách hóa đơn!");
       }
     }
-    fetchData();
+    fetchInvoices();
   }, []);
 
-  const handleAddDetail = () => {
-    const total = detail.SOLUONGBAN * (1 - detail.GIAMGIA) * detail.THANHTIEN;
-    setInvoice((prev) => ({
-      ...prev,
-      details: [...prev.details, { ...detail, THANHTIEN: total }],
-    }));
-    setDetail({ MAVACH: "", SOLUONGBAN: 0, GIAMGIA: 0, THANHTIEN: 0 });
+  // Lấy chi tiết hóa đơn
+  const handleViewDetails = async (invoice) => {
+    try {
+      const details = await getInvoiceDetails(invoice.MA_HD); // Gọi API để lấy chi tiết hóa đơn
+      setInvoiceDetails(details); // Lưu chi tiết hóa đơn vào state
+      setSelectedInvoice(invoice.MA_HD); // Lưu mã hóa đơn đã chọn vào state
+      setSelectedInvoiceData(invoice); // Lưu thông tin hóa đơn đã chọn
+    } catch (error) {
+      console.error("Lỗi khi lấy chi tiết hóa đơn:", error);
+      alert("Không thể lấy chi tiết hóa đơn!");
+    }
   };
 
-  const handleSubmit = async () => {
+  // Cập nhật trạng thái thanh toán
+  const handlePaymentStatusChange = async () => {
+    if (selectedInvoiceData.DATHANHTOAN) {
+      alert("Hóa đơn đã thanh toán không thể thay đổi!");
+      return;
+    }
+
     try {
-      await addInvoice(invoice);
-      for (const d of invoice.details) {
-        await addInvoiceDetail({ MA_HD: invoice.MA_HD, ...d });
-      }
-      alert("Hóa đơn đã được lưu!");
+      await updateInvoiceStatus(selectedInvoiceData.MA_HD, true); // Đánh dấu đã thanh toán
+      setInvoices((prev) =>
+        prev.map((inv) =>
+          inv.MA_HD === selectedInvoiceData.MA_HD
+            ? { ...inv, DATHANHTOAN: true }
+            : inv
+        )
+      );
+      setSelectedInvoiceData((prev) => ({
+        ...prev,
+        DATHANHTOAN: true,
+      }));
+      alert("Cập nhật trạng thái thanh toán thành công!");
     } catch (error) {
-      console.error("Lỗi khi lưu hóa đơn:", error);
-      alert("Không thể lưu hóa đơn!");
+      console.error("Lỗi khi cập nhật trạng thái thanh toán:", error);
+      alert("Không thể cập nhật trạng thái thanh toán!");
     }
   };
 
   return (
     <div>
-      <h2>Lập Hóa Đơn</h2>
-      <form>
-        <label>Mã Hóa Đơn:</label>
-        <input
-          type="text"
-          value={invoice.MA_HD}
-          onChange={(e) => setInvoice({ ...invoice, MA_HD: e.target.value })}
-        />
-        <label>Khách Hàng:</label>
-        <select
-          value={invoice.MA_KH}
-          onChange={(e) => setInvoice({ ...invoice, MA_KH: e.target.value })}
-        >
-          <option value="">Chọn Khách Hàng</option>
-          {customers.map((c) => (
-            <option key={c.MA_KH} value={c.MA_KH}>
-              {c.HOTEN_KH}
-            </option>
-          ))}
-        </select>
-        <label>Nhân Viên:</label>
-        <select
-          value={invoice.MA_NV}
-          onChange={(e) => setInvoice({ ...invoice, MA_NV: e.target.value })}
-        >
-          <option value="">Chọn Nhân Viên</option>
-          {employees.map((e) => (
-            <option key={e.MA_NV} value={e.MA_NV}>
-              {e.HOTEN_NV}
-            </option>
-          ))}
-        </select>
-        <label>Ngày Lập Hóa Đơn:</label>
-        <input
-          type="date"
-          value={invoice.NGAYLAPHOADON}
-          onChange={(e) =>
-            setInvoice({ ...invoice, NGAYLAPHOADON: e.target.value })
-          }
-        />
-        <label>Đã Thanh Toán:</label>
-        <input
-          type="checkbox"
-          checked={invoice.DATHANHTOAN}
-          onChange={(e) =>
-            setInvoice({ ...invoice, DATHANHTOAN: e.target.checked })
-          }
-        />
-        <h3>Chi Tiết Hóa Đơn</h3>
-        <label>Mã Vạch:</label>
-        <input
-          type="text"
-          value={detail.MAVACH}
-          onChange={(e) => setDetail({ ...detail, MAVACH: e.target.value })}
-        />
-        <label>Số Lượng:</label>
-        <input
-          type="number"
-          value={detail.SOLUONGBAN}
-          onChange={(e) => setDetail({ ...detail, SOLUONGBAN: e.target.value })}
-        />
-        <label>Giảm Giá (%):</label>
-        <input
-          type="number"
-          value={detail.GIAMGIA}
-          onChange={(e) => setDetail({ ...detail, GIAMGIA: e.target.value })}
-        />
-        <label>Thành Tiền:</label>
-        <input
-          type="number"
-          value={detail.THANHTIEN}
-          onChange={(e) => setDetail({ ...detail, THANHTIEN: e.target.value })}
-        />
-        <button type="button" onClick={handleAddDetail}>
-          Thêm Chi Tiết
-        </button>
-      </form>
-      <h3>Danh Sách Chi Tiết</h3>
+      <h2>Danh Sách Hóa Đơn</h2>
       <table>
         <thead>
           <tr>
-            <th>Mã Vạch</th>
-            <th>Số Lượng</th>
-            <th>Giảm Giá</th>
-            <th>Thành Tiền</th>
+            <th>Mã HĐ</th>
+            <th>Khách Hàng</th>
+            <th>Nhân Viên</th>
+            <th>Ngày Lập</th>
+            <th>Đã Thanh Toán</th>
+            <th>Thao Tác</th>
           </tr>
         </thead>
         <tbody>
-          {invoice.details.map((d, index) => (
-            <tr key={index}>
-              <td>{d.MAVACH}</td>
-              <td>{d.SOLUONGBAN}</td>
-              <td>{d.GIAMGIA}</td>
-              <td>{d.THANHTIEN}</td>
+          {invoices.map((invoice) => (
+            <tr key={invoice.MA_HD}>
+              <td>{invoice.MA_HD}</td>
+              <td>{invoice.HOTEN_KH}</td>
+              <td>{invoice.HOTEN_NV}</td>
+              <td>{invoice.NGAYLAPHOADON}</td>
+              <td>{invoice.DATHANHTOAN ? "Có" : "Không"}</td>
+              <td>
+                <button onClick={() => handleViewDetails(invoice)}>
+                  Xem Chi Tiết
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button type="button" onClick={handleSubmit}>
-        Lưu Hóa Đơn
-      </button>
+
+      {/* Hiển thị chi tiết hóa đơn */}
+      {selectedInvoice && (
+        <div>
+          <h3>Chi Tiết Hóa Đơn: {selectedInvoice}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Sản Phẩm</th>
+                <th>Số Lượng</th>
+                <th>Giảm Giá</th>
+                <th>Thành Tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoiceDetails.map((detail, index) => (
+                <tr key={index}>
+                  <td>{detail.TENHANG}</td>
+                  <td>{detail.SOLUONGBAN}</td>
+                  <td>{detail.GIAMGIA}</td>
+                  <td>{detail.THANHTIEN}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <button
+            onClick={handlePaymentStatusChange}
+            disabled={selectedInvoiceData?.DATHANHTOAN}
+          >
+            {selectedInvoiceData?.DATHANHTOAN ? "Đã Thanh Toán" : "Thanh Toán"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

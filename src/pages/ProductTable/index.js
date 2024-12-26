@@ -157,13 +157,6 @@ function ProductTable() {
         <button onClick={handleAddClick} className="add-product-button">
           Thêm Sản Phẩm
         </button>
-        <input
-          type="text"
-          placeholder="Tìm kiếm sản phẩm..."
-          value={searchKeyword}
-          onChange={handleSearchChange}
-        />
-        <button onClick={fetchProducts}>Tìm kiếm</button>
       </div>
       <div>
         <input

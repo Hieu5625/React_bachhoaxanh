@@ -27,7 +27,7 @@ function Layout() {
         <h1>Quản Lý Cửa Hàng Bách Hóa Xanh</h1>
         <div className="user-info">
           <span>
-            Xin chào, <Link to="/user">{userName}</Link>
+            Xin chào, <Link to="/home">{userName}</Link>
           </span>
           <button onClick={handleLogout} className="logout-button">
             Đăng Xuất
@@ -56,10 +56,10 @@ function Layout() {
               <NavLink to="/receipts">Danh Sách Phiếu Nhập</NavLink>
             </li>
             <li>
-              <NavLink to="/invoices">Danh Sách Hóa Đơn</NavLink>
+              <NavLink to="/invoice">Lập Hóa Đơn</NavLink>
             </li>
             <li>
-              <NavLink to="/invoice">Lập Hóa Đơn</NavLink>
+              <NavLink to="/invoices">Danh Sách Hóa Đơn</NavLink>
             </li>
           </ul>
         </nav>

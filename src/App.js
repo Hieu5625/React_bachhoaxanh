@@ -22,8 +22,8 @@ function App() {
           <Route path="employees" element={<EmployeeTable />} />
           <Route path="Receipt" element={<ReceiptForm />} />
           <Route path="receipts" element={<ReceiptTable />} />
-          <Route path="invoice" element={<InvoiceTable />} />
-          <Route path="invoices" element={<CreateInvoice />} />
+          <Route path="invoice" element={<CreateInvoice />} />
+          <Route path="invoices" element={<InvoiceTable />} />
         </Route>
       </Routes>
     </>
