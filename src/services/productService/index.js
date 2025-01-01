@@ -3,6 +3,22 @@ const API_CATEGORY_URL = "http://localhost:5000/api/categories";
 const API_UPDATE_FROM_RECEIPT =
   "http://localhost:5000/api/products/update-from-receipt";
 
+// Hàm cập nhật số lượng sản phẩm
+export const updateProductQuantity = async (MAVACH, quantityChange) => {
+  try {
+    const response = await fetch(`${API_URL}/update-quantity`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ MAVACH, quantityChange }),
+    });
+    if (!response.ok) throw new Error("Lỗi khi cập nhật số lượng sản phẩm");
+    return await response.json();
+  } catch (error) {
+    console.error("Lỗi khi gọi API updateProductQuantity:", error);
+    throw error;
+  }
+};
+
 // Lấy danh mục sản phẩm
 export const getCategories = async () => {
   try {

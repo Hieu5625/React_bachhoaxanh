@@ -3,6 +3,7 @@ import {
   getInvoices,
   getInvoiceDetails,
   updateInvoiceStatus,
+  updateStockAfterPayment,
 } from "../../services/InvoiceService";
 
 function InvoiceTable() {
@@ -38,15 +39,21 @@ function InvoiceTable() {
     }
   };
 
-  // Cập nhật trạng thái thanh toán
+  // Cập nhật trạng thái thanh toán và số lượng sản phẩm
   const handlePaymentStatusChange = async () => {
-    if (selectedInvoiceData.DATHANHTOAN) {
+    if (selectedInvoiceData?.DATHANHTOAN) {
       alert("Hóa đơn đã thanh toán không thể thay đổi!");
       return;
     }
 
     try {
-      await updateInvoiceStatus(selectedInvoiceData.MA_HD, true); // Đánh dấu đã thanh toán
+      // Cập nhật trạng thái thanh toán
+      await updateInvoiceStatus(selectedInvoiceData.MA_HD, true);
+
+      // Cập nhật số lượng sản phẩm
+      await updateStockAfterPayment(selectedInvoiceData.MA_HD);
+
+      // Cập nhật giao diện
       setInvoices((prev) =>
         prev.map((inv) =>
           inv.MA_HD === selectedInvoiceData.MA_HD
@@ -54,14 +61,11 @@ function InvoiceTable() {
             : inv
         )
       );
-      setSelectedInvoiceData((prev) => ({
-        ...prev,
-        DATHANHTOAN: true,
-      }));
-      alert("Cập nhật trạng thái thanh toán thành công!");
+      setSelectedInvoiceData((prev) => ({ ...prev, DATHANHTOAN: true }));
+      alert("Cập nhật trạng thái thanh toán và số lượng sản phẩm thành công!");
     } catch (error) {
-      console.error("Lỗi khi cập nhật trạng thái thanh toán:", error);
-      alert("Không thể cập nhật trạng thái thanh toán!");
+      console.error("Lỗi khi cập nhật:", error);
+      alert("Không thể cập nhật trạng thái thanh toán hoặc số lượng sản phẩm!");
     }
   };
 
